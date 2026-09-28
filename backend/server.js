@@ -249,13 +249,67 @@ app.get("/api/weather", async (req, res) => {
       shimla: [31.1048, 77.1734],
       agra: [27.1767, 78.0081],
       kanpur: [26.4499, 80.3319],
+      prayagraj: [25.4358, 81.8463],
+      allahabad: [25.4358, 81.8463],
+      noida: [28.5355, 77.391],
+      gurugram: [28.4595, 77.0266],
+      gurgaon: [28.4595, 77.0266],
+      amritsar: [31.634, 74.8723],
+      nagpur: [21.1458, 79.0882],
+      coimbatore: [11.0168, 76.9558],
+      visakhapatnam: [17.6868, 83.2185],
+      kochi: [9.9312, 76.2673],
+      cochin: [9.9312, 76.2673],
+      thiruvananthapuram: [8.5241, 76.9366],
+      trivandrum: [8.5241, 76.9366],
+      mysuru: [12.2958, 76.6394],
+      mysore: [12.2958, 76.6394],
+      jammu: [32.7266, 74.857],
+      imphal: [24.817, 93.9368],
+      shillong: [25.5788, 91.8933],
+      raipur: [21.2514, 81.6296],
+      panaji: [15.4909, 73.8278],
+      goa: [15.2993, 74.124],
+      surat: [21.1702, 72.8311],
+      vadodara: [22.3072, 73.1812],
+      rajkot: [22.3039, 70.8022],
+      nashik: [19.9975, 73.7898],
+      aurangabad: [19.8762, 75.3433],
+      jodhpur: [26.2389, 73.0243],
+      udaipur: [24.5854, 73.7125],
+      kota: [25.2138, 75.8648],
+      gwalior: [26.2183, 78.1828],
+      jabalpur: [23.1815, 79.9864],
+      bareilly: [28.367, 79.4304],
+      aligarh: [27.8974, 78.088],
+      gorakhpur: [26.7606, 83.3732],
     };
 
-    const coordinates = cityCoordinates[city];
+    let coordinates = cityCoordinates[city];
+    let resolvedCityName = city.charAt(0).toUpperCase() + city.slice(1);
+
+    // If not in predefined list, dynamically fetch coordinates via Open-Meteo Geocoding
+    if (!coordinates) {
+      try {
+        const geoRes = await fetch(
+          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`
+        );
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          if (geoData.results && geoData.results.length > 0) {
+            coordinates = [geoData.results[0].latitude, geoData.results[0].longitude];
+            resolvedCityName = geoData.results[0].name;
+          }
+        }
+      } catch (geoErr) {
+        console.warn("Geocoding lookup error:", geoErr.message);
+      }
+    }
+
     if (!coordinates) {
       return res.status(404).json({
-        message: "City not found",
-        availableCities: Object.keys(cityCoordinates),
+        message: "City not found. Please check spelling or enter another Indian city.",
+        availableCities: Object.keys(cityCoordinates).slice(0, 15),
       });
     }
 

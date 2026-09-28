@@ -17,8 +17,8 @@ function Home() {
         if (Array.isArray(data)) {
           const activeAlerts = data.filter(
             (report) =>
-              report.severity === "High" ||
-              report.severity === "Critical"
+              (report.severity === "High" || report.severity === "Critical") &&
+              report.verificationStatus === "Verified"
           );
           setAlerts(activeAlerts);
         }
