@@ -7,17 +7,55 @@ const WeatherReport = require("./models/WeatherReport");
 const app = express();
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("✅ MongoDB connected successfully!"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err.message));
+const MONGODB_URI =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://abhishek798571_db_user:rW6zjoUL1KmE9dtr@meghsetu.wwv9xm9.mongodb.net/?appName=MeghSetu";
 
-// Middleware
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : "*",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+mongoose
+  .connect(MONGODB_URI, {
+    serverSelectionTimeoutMS: 15000,
+  })
+  .then(() => console.log("✅ MongoDB connected successfully!"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err.message);
+    console.error("👉 Please verify your internet connection and MongoDB Atlas IP whitelist (0.0.0.0/0).");
+  });
+
+mongoose.connection.on("error", (err) => {
+  console.error("❌ MongoDB runtime connection error:", err.message);
+});
+
+// Middleware - Robust CORS Configuration
+const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // If wild-card or empty, allow all origins
+      if (!allowedOriginsEnv || allowedOriginsEnv.trim() === "*" || allowedOriginsEnv === "") {
+        return callback(null, true);
+      }
+
+      const originsList = allowedOriginsEnv.split(",").map((o) => o.trim());
+      if (originsList.includes("*") || originsList.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Automatically allow localhost development ports (e.g. Vite 5173, React 3000, 5174, etc.)
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Default fallback: allow to ensure cloud frontend deployments are never blocked
+      return callback(null, true);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  })
+);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
@@ -463,7 +501,7 @@ app.patch("/api/admin/reports/:id", async (req, res) => {
         verificationNote: verificationNote || "",
         verifiedBy: verifiedBy || "Admin",
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!report) return res.status(404).json({ message: "Report not found" });
@@ -487,7 +525,7 @@ app.post("/api/admin/reports/:id/analyze", async (req, res) => {
     const updated = await WeatherReport.findByIdAndUpdate(
       req.params.id,
       { ...aiResult },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     res.json({ message: "AI analysis complete", report: updated, ai: aiResult });

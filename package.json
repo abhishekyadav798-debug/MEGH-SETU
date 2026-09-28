@@ -1,4 +1,13 @@
 {
+  "name": "megh-setu",
+  "version": "2.0.0",
+  "description": "MeghSetu - National Weather Intelligence & Early Warning Platform",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "backend": "node backend/server.js",
+    "frontend": "npm --prefix frontend run dev"
+  },
   "dependencies": {
     "react-router-dom": "^7.18.4"
   }
