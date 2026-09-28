@@ -18,6 +18,10 @@ frontend/.env
 npm-debug.log*
 yarn-debug.log*
 
+# Scripts
+push_to_github.bat
+*.zip
+
 # IDE & OS
 .vscode/
 .idea/
