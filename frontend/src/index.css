@@ -2043,3 +2043,167 @@ body {
     justify-content: space-between;
   }
 }
+
+/* ==========================================================================
+   SIMPLIFIED & FAST INFORMATION ARCHITECTURE STYLES
+   ========================================================================== */
+.simple-hero {
+  padding: 48px 24px 32px;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.simple-hero .hero-content {
+  max-width: 800px;
+  margin: 0 auto 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.simple-hero .hero-title {
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -1px;
+  margin: 16px 0 14px;
+}
+
+.simple-hero .hero-title span {
+  background: linear-gradient(135deg, #00d2ff, #7928ca);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.simple-hero .hero-description {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 650px;
+  margin-bottom: 24px;
+}
+
+.simple-hero .hero-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* QUICK STATUS STRIP */
+.hero-status-strip {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.status-strip-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.status-strip-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.status-strip-icon {
+  font-size: 24px;
+}
+
+.status-strip-card strong {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.status-strip-card p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* FAST ACCESS SERVICES GRID */
+.simple-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.25s ease;
+}
+
+.service-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 210, 255, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.service-icon {
+  font-size: 32px;
+  margin-bottom: 14px;
+}
+
+.service-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px;
+}
+
+.service-card p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 16px;
+  flex-grow: 1;
+}
+
+.service-link-arrow {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.secondary-refresh {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-muted) !important;
+}
+.secondary-refresh:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+}

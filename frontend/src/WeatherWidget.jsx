@@ -14,22 +14,25 @@ const getWeatherDescription = (code) => {
   return { text: "Moderate", icon: "🌤️" };
 };
 
-const CITIES = [
-  "Meerut",
+const INITIAL_CITIES = [
   "Delhi",
   "Mumbai",
+  "Bengaluru",
+  "Kolkata",
+  "Chennai",
+  "Hyderabad",
   "Lucknow",
   "Jaipur",
+  "Meerut",
   "Patna",
-  "Kolkata",
-  "Indore",
-  "Varanasi",
-  "Dehradun",
+  "Ahmedabad",
+  "Pune",
 ];
 
 function WeatherWidget() {
   const [weatherData, setWeatherData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchingCity, setSearchingCity] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -39,12 +42,10 @@ function WeatherWidget() {
     setError(null);
     try {
       const results = await Promise.all(
-        CITIES.map(async (city) => {
+        INITIAL_CITIES.map(async (city) => {
           try {
             const res = await fetch(`${API_BASE}/api/weather?city=${encodeURIComponent(city)}`);
-            if (!res.ok) {
-              return { location: city, error: true };
-            }
+            if (!res.ok) return { location: city, error: true };
             return await res.json();
           } catch {
             return { location: city, error: true };
@@ -52,7 +53,13 @@ function WeatherWidget() {
         })
       );
       setWeatherData(results);
-      setLastUpdated(new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+      setLastUpdated(
+        new Date().toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })
+      );
     } catch (err) {
       console.error("Weather fetch error:", err);
       setError("Unable to connect to meteorological backend service.");
@@ -65,42 +72,82 @@ function WeatherWidget() {
     fetchAllWeather();
   }, []);
 
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) return;
+
+    // If already in list, no need to re-fetch
+    const alreadyExists = weatherData.find(
+      (item) => item.location?.toLowerCase() === query.toLowerCase()
+    );
+    if (alreadyExists) return;
+
+    setSearchingCity(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/weather?city=${encodeURIComponent(query)}`);
+      if (res.ok) {
+        const data = await res.json();
+        // Place newly searched city at the top
+        setWeatherData((prev) => [
+          data,
+          ...prev.filter((p) => p.location?.toLowerCase() !== query.toLowerCase()),
+        ]);
+      } else {
+        alert(`City "${query}" not found. Please verify spelling.`);
+      }
+    } catch (err) {
+      alert("Failed to fetch weather for " + query);
+    } finally {
+      setSearchingCity(false);
+    }
+  };
+
   const filteredCities = weatherData.filter((item) =>
     item.location?.toLowerCase().includes(searchQuery.toLowerCase().trim())
   );
 
   return (
-    <section className="weather-widget">
+    <section className="weather-widget" id="weather-section">
       <div className="weather-widget-header">
         <div>
           <p className="eyebrow">METEOROLOGICAL SENSING NODES</p>
-          <h2>🌦️ Live National Weather Stream</h2>
-          <p>Real-time atmospheric telemetry ingested from Open-Meteo across 10 strategic Indian cities.</p>
+          <h2>🌦️ Live City Weather</h2>
+          <p>Real-time atmospheric readings from Open-Meteo across major Indian regions.</p>
         </div>
 
-        <div className="weather-widget-controls">
+        <form className="weather-widget-controls" onSubmit={handleSearchSubmit}>
           <input
             type="text"
             className="weather-search-input"
-            placeholder="Search city (e.g. Delhi, Jaipur)..."
+            placeholder="Search any city (e.g. Meerut, Pune, Dehradun)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <button
+            type="submit"
             className="refresh-btn"
+            disabled={searchingCity}
+            title="Search Indian City"
+          >
+            {searchingCity ? "Searching..." : "🔍 Search"}
+          </button>
+          <button
+            type="button"
+            className="refresh-btn secondary-refresh"
             onClick={fetchAllWeather}
             disabled={loading}
             title="Refresh current meteorological observation"
           >
-            {loading ? "Refreshing..." : "🔄 Refresh"}
+            {loading ? "..." : "🔄 Refresh"}
           </button>
-        </div>
+        </form>
       </div>
 
       {lastUpdated && (
         <div className="last-updated-row">
-          <span>🕒 Last sync with Open-Meteo: <strong>{lastUpdated} IST</strong></span>
-          <span className="source-pill">📡 Source: Global Weather Forecast Model</span>
+          <span>🕒 Last synchronized: <strong>{lastUpdated} IST</strong></span>
+          <span className="source-pill">📡 Source: Open-Meteo Satellite Feed</span>
         </div>
       )}
 
@@ -118,7 +165,9 @@ function WeatherWidget() {
         <div className="weather-grid">
           {filteredCities.map((item) => {
             const hasData = item.weather && typeof item.weather.temperature_2m !== "undefined";
-            const weatherDesc = hasData ? getWeatherDescription(item.weather.weather_code) : { text: "Data Unavailable", icon: "⚠️" };
+            const weatherDesc = hasData
+              ? getWeatherDescription(item.weather.weather_code)
+              : { text: "Data Unavailable", icon: "⚠️" };
 
             return (
               <div className="weather-city-card" key={item.location}>
@@ -132,7 +181,9 @@ function WeatherWidget() {
                     <div className="weather-primary-info">
                       <span className="weather-condition-icon">{weatherDesc.icon}</span>
                       <div className="temp-block">
-                        <span className="city-temperature">{Math.round(item.weather.temperature_2m)}°C</span>
+                        <span className="city-temperature">
+                          {Math.round(item.weather.temperature_2m)}°C
+                        </span>
                         <span className="weather-condition-text">{weatherDesc.text}</span>
                       </div>
                     </div>
