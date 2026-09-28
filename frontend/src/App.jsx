@@ -20,7 +20,7 @@ function App() {
         <header className="gov-bar">
           <div className="gov-bar-content">
             <span className="gov-flag">🇮🇳</span>
-            <span>NATIONAL WEATHER INTELLIGENCE &amp; DISASTER EARLY WARNING NETWORK — Problem #26069 | SIH 2026</span>
+            <span>GOVERNMENT OF INDIA • NATIONAL WEATHER INTELLIGENCE &amp; DISASTER EARLY WARNING NETWORK</span>
             <span className="gov-status-pill">
               <span className="pulse-dot"></span> LIVE NETWORK
             </span>
@@ -88,9 +88,9 @@ function App() {
                 India's Weather Intelligence Network — Real-time meteorological observation, citizen crowdsensing, AI/ML analytics, and national disaster resilience.
               </p>
               <div className="footer-hackathon-info">
-                <span>🏆 Smart India Hackathon 2026</span>
-                <span>🔖 Problem #26069</span>
-                <span>👥 Team CODEXAIV — ID 182006</span>
+                <span>🏛️ Ministry of Earth Sciences (MoES)</span>
+                <span>📡 India Meteorological Department (IMD)</span>
+                <span>🛡️ National Disaster Management Authority (NDMA)</span>
               </div>
             </div>
 
@@ -102,7 +102,7 @@ function App() {
                 <li><Link to="/events">Weather Events Log</Link></li>
                 <li><Link to="/analytics">Analytics &amp; Risk Metrics</Link></li>
                 <li><Link to="/report">Report Weather Event</Link></li>
-                <li><Link to="/admin" style={{ color: "#a78bfa" }}>🛡️ Admin Panel</Link></li>
+                <li><Link to="/admin" style={{ color: "#a78bfa" }}>🛡️ Official Command Center (Authorized Only)</Link></li>
               </ul>
             </div>
 
@@ -130,7 +130,7 @@ function App() {
           </div>
 
           <div className="footer-bottom">
-            <p>© 2026 MeghSetu — India's Weather Intelligence &amp; Early Warning Portal | SIH 2026 | Team CODEXAIV</p>
+            <p>© 2026 MeghSetu — National Weather Big Data Analytics &amp; Early Warning Network | Government of India</p>
             <div className="footer-bottom-badges">
               <span className="badge-pill">Disaster Management</span>
               <span className="badge-pill">Meteorological Big Data</span>

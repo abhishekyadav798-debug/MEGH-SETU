@@ -406,7 +406,7 @@ function Admin() {
             textAlign: "center",
           }}>
             <p style={{ fontSize: "11px", color: "var(--text-dim)", margin: "0 0 6px", fontWeight: 600 }}>
-              💡 Hackathon Evaluator Credentials:
+              💡 Authorized System Credentials:
             </p>
             <p style={{ fontSize: "12px", color: "var(--accent-cyan)", margin: "0 0 8px", fontFamily: "monospace" }}>
               ID: <strong>admin</strong> | Pass: <strong>meghsetu2026</strong>
