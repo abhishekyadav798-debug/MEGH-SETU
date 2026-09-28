@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { API_BASE } from "../config";
 
 const STATUS_COLORS = {
@@ -41,6 +42,15 @@ function StatCard({ icon, label, value, color }) {
 }
 
 function Admin() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem("meghsetu_admin_auth") === "true";
+  });
+  const [officerName, setOfficerName] = useState(() => {
+    return sessionStorage.getItem("meghsetu_admin_user") || "Officer In-Charge";
+  });
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
+  const [loginError, setLoginError] = useState("");
+
   const [reports, setReports]       = useState([]);
   const [stats, setStats]           = useState(null);
   const [loading, setLoading]       = useState(true);
@@ -56,15 +66,17 @@ function Admin() {
   });
 
   const fetchStats = useCallback(async () => {
+    if (!isAuthenticated) return;
     setStatsLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/admin/stats`);
       if (res.ok) setStats(await res.json());
     } catch (e) { console.error("Stats fetch error:", e); }
     finally { setStatsLoading(false); }
-  }, []);
+  }, [isAuthenticated]);
 
   const fetchReports = useCallback(async (page = 1) => {
+    if (!isAuthenticated) return;
     setLoading(true);
     try {
       const params = new URLSearchParams({ page, limit: 20 });
@@ -84,12 +96,44 @@ function Admin() {
       }
     } catch (e) { console.error("Reports fetch error:", e); }
     finally { setLoading(false); }
-  }, [filters]);
+  }, [isAuthenticated, filters]);
 
   useEffect(() => {
-    fetchStats();
-    fetchReports(1);
-  }, [fetchStats, fetchReports]);
+    if (isAuthenticated) {
+      fetchStats();
+      fetchReports(1);
+    }
+  }, [isAuthenticated, fetchStats, fetchReports]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setLoginError("");
+    const u = loginForm.username.trim().toLowerCase();
+    const p = loginForm.password.trim();
+
+    if ((u === "admin" || u === "officer" || u === "imd") && (p === "meghsetu2026" || p === "admin123" || p === "meghsetu@2026")) {
+      const name = loginForm.username.trim();
+      sessionStorage.setItem("meghsetu_admin_auth", "true");
+      sessionStorage.setItem("meghsetu_admin_user", name);
+      setOfficerName(name);
+      setIsAuthenticated(true);
+    } else {
+      setLoginError("Invalid credentials. Try Officer ID: admin | Passcode: meghsetu2026");
+    }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("meghsetu_admin_auth");
+    sessionStorage.removeItem("meghsetu_admin_user");
+    setIsAuthenticated(false);
+    setLoginForm({ username: "", password: "" });
+    setLoginError("");
+  };
+
+  const handleAutoFill = () => {
+    setLoginForm({ username: "admin", password: "meghsetu2026" });
+    setLoginError("");
+  };
 
   const handleFilterChange = (key, val) => {
     setFilters((prev) => ({ ...prev, [key]: val }));
@@ -199,15 +243,228 @@ function Admin() {
     </button>
   );
 
+  // If not authenticated, show Government Security Login Screen
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: "75vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "40px 20px",
+      }}>
+        <div style={{
+          width: "100%",
+          maxWidth: "460px",
+          background: "linear-gradient(180deg, #0c1b30 0%, #081322 100%)",
+          border: "1px solid rgba(0, 212, 255, 0.25)",
+          borderRadius: "20px",
+          padding: "36px 32px",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(0, 212, 255, 0.1)",
+          position: "relative",
+          overflow: "hidden",
+        }}>
+          {/* Top subtle glow bar */}
+          <div style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "4px",
+            background: "linear-gradient(90deg, #00d4ff, #7c3aed, #00d4ff)",
+          }}></div>
+
+          <div style={{ textAlign: "center", marginBottom: "28px" }}>
+            <div style={{
+              width: "64px",
+              height: "64px",
+              borderRadius: "16px",
+              background: "rgba(0, 212, 255, 0.08)",
+              border: "1px solid rgba(0, 212, 255, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "30px",
+              margin: "0 auto 16px",
+              boxShadow: "0 0 20px rgba(0, 212, 255, 0.2)",
+            }}>
+              🛡️
+            </div>
+            <p style={{
+              fontSize: "10px",
+              color: "var(--accent-cyan)",
+              fontWeight: 800,
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              marginBottom: "6px",
+            }}>
+              RESTRICTED ACCESS • DISASTER CELL
+            </p>
+            <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#fff", margin: "0 0 8px" }}>
+              MeghSetu Command Center
+            </h2>
+            <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>
+              Authorized meteorological officers &amp; disaster triage personnel only.
+            </p>
+          </div>
+
+          {loginError && (
+            <div style={{
+              background: "rgba(255, 77, 79, 0.12)",
+              border: "1px solid rgba(255, 77, 79, 0.4)",
+              borderRadius: "10px",
+              padding: "10px 14px",
+              marginBottom: "20px",
+              color: "#ff7875",
+              fontSize: "12px",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}>
+              <span>⚠️</span>
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Officer ID / Username
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. admin"
+                value={loginForm.username}
+                onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
+                style={{
+                  width: "100%",
+                  background: "var(--bg-surface)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: "10px",
+                  padding: "12px 14px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Security Passcode
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="••••••••••••"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                style={{
+                  width: "100%",
+                  background: "var(--bg-surface)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: "10px",
+                  padding: "12px 14px",
+                  color: "#fff",
+                  fontSize: "14px",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                background: "linear-gradient(135deg, #00d4ff 0%, #0077b6 100%)",
+                border: "none",
+                borderRadius: "10px",
+                padding: "12px",
+                color: "#030c17",
+                fontSize: "14px",
+                fontWeight: 800,
+                cursor: "pointer",
+                marginTop: "4px",
+                boxShadow: "0 4px 15px rgba(0, 212, 255, 0.3)",
+                transition: "all 0.2s ease",
+              }}
+            >
+              🔓 Authenticate &amp; Access Admin
+            </button>
+          </form>
+
+          {/* Quick Demo Credentials Pill for Evaluators */}
+          <div style={{
+            marginTop: "20px",
+            background: "rgba(0, 212, 255, 0.05)",
+            border: "1px dashed rgba(0, 212, 255, 0.3)",
+            borderRadius: "10px",
+            padding: "12px 14px",
+            textAlign: "center",
+          }}>
+            <p style={{ fontSize: "11px", color: "var(--text-dim)", margin: "0 0 6px", fontWeight: 600 }}>
+              💡 Hackathon Evaluator Credentials:
+            </p>
+            <p style={{ fontSize: "12px", color: "var(--accent-cyan)", margin: "0 0 8px", fontFamily: "monospace" }}>
+              ID: <strong>admin</strong> | Pass: <strong>meghsetu2026</strong>
+            </p>
+            <button
+              type="button"
+              onClick={handleAutoFill}
+              style={{
+                background: "rgba(0, 212, 255, 0.12)",
+                border: "1px solid rgba(0, 212, 255, 0.3)",
+                color: "var(--accent-cyan)",
+                borderRadius: "6px",
+                padding: "5px 12px",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              ⚡ Auto-Fill Credentials
+            </button>
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: "24px" }}>
+            <Link to="/" style={{ color: "var(--text-dim)", fontSize: "12px", textDecoration: "none" }}>
+              ← Return to Citizen Public Portal
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: "28px 5%", maxWidth: "1400px", margin: "0 auto" }}>
 
       {/* Header */}
       <div style={{ marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
         <div>
-          <p style={{ fontSize: "11px", color: "var(--accent-cyan)", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", marginBottom: "6px" }}>
-            MEGHSETU ADMIN CONTROL
-          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+            <span style={{ fontSize: "11px", color: "var(--accent-cyan)", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase" }}>
+              MEGHSETU ADMIN CONTROL
+            </span>
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              background: "rgba(0, 230, 118, 0.1)",
+              border: "1px solid rgba(0, 230, 118, 0.3)",
+              color: "#00e676",
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "2px 8px",
+              borderRadius: "20px",
+            }}>
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#00e676", display: "inline-block" }}></span>
+              Officer: {officerName}
+            </span>
+          </div>
           <h1 style={{ fontSize: "28px", fontWeight: 800, margin: 0 }}>Admin Dashboard</h1>
           <p style={{ color: "var(--text-muted)", fontSize: "14px", marginTop: "4px" }}>
             Manage, verify, and analyze all incoming weather reports.
@@ -235,6 +492,17 @@ function Admin() {
             }}
           >
             🔄 Refresh
+          </button>
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "rgba(255, 77, 79, 0.12)", border: "1px solid rgba(255, 77, 79, 0.4)",
+              color: "#ff7875", borderRadius: "10px",
+              padding: "10px 16px", fontSize: "13px", fontWeight: 700, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: "6px",
+            }}
+          >
+            🚪 Logout
           </button>
         </div>
       </div>

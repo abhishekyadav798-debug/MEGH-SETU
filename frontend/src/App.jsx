@@ -58,9 +58,6 @@ function App() {
             <NavLink to="/analytics" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} onClick={closeMenu}>
               Analytics
             </NavLink>
-            <NavLink to="/admin" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} onClick={closeMenu} style={{ color: "#a78bfa" }}>
-              🛡️ Admin
-            </NavLink>
             <Link to="/report" className="report-btn" onClick={closeMenu}>
               <span className="report-btn-icon">⚡</span> Report Event
             </Link>
