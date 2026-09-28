@@ -87,7 +87,7 @@ function App() {
               <p className="footer-tagline">
                 India's Weather Intelligence Network — Real-time meteorological observation, citizen crowdsensing, AI/ML analytics, and national disaster resilience.
               </p>
-              <div className="footer-hackathon-info">
+              <div className="footer-gov-info">
                 <span>🏛️ Ministry of Earth Sciences (MoES)</span>
                 <span>📡 India Meteorological Department (IMD)</span>
                 <span>🛡️ National Disaster Management Authority (NDMA)</span>

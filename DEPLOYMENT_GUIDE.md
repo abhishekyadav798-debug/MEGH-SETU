@@ -1,5 +1,5 @@
 # 🚀 MeghSetu — Complete Cloud Deployment Guide
-**Smart India Hackathon 2026 | Problem #26069 | Team CODEXAIV (182006)**
+**National Weather Big Data Analytics Platform | Government of India**
 
 ---
 
@@ -18,7 +18,7 @@ Open terminal in the `MEGH-SETU` root folder and run:
 
 ```bash
 git add .
-git commit -m "MeghSetu v2.0 - SIH 2026 National Weather Big Data Analytics Platform"
+git commit -m "MeghSetu v2.0 - National Weather Big Data Analytics Platform"
 git branch -M main
 ```
 

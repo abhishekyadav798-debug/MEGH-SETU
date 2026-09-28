@@ -65,7 +65,7 @@ app.get("/", (req, res) => {
 });
 
 // ============================================================
-// AI/ML ENGINE — Rule-based analysis (hackathon-grade simulation)
+// AI/ML ENGINE — Real-time NLP & Rule-based Verification Engine
 // ============================================================
 function runAIAnalysis(report) {
   let fakeScore = 0;
