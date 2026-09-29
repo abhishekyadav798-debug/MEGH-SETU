@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import WeatherWidget from "../WeatherWidget";
+import WeatherNews from "../WeatherNews";
 import { API_BASE } from "../config";
 
 function Home() {
@@ -33,8 +34,10 @@ function Home() {
 
   return (
     <div className="home-page">
-
-      {/* 1. SIMPLE & CLEAR HERO SECTION */}
+      {/* 2-COLUMN LAYOUT: main content left, news sidebar right */}
+      <div className="home-two-col-layout">
+        <div className="home-main-col">
+          {/* 1. SIMPLE & CLEAR HERO SECTION */}
       <section className="hero-section simple-hero">
         <div className="hero-content">
           <div className="hero-pill">
@@ -208,22 +211,28 @@ function Home() {
         </div>
       </section>
 
-      {/* 5. EMERGENCY HELPLINES STRIP */}
-      <section className="emergency-banner-section">
-        <div className="emergency-banner">
-          <div className="emergency-banner-left">
-            <span className="emergency-icon">🛡️</span>
-            <div>
-              <h4>National Emergency &amp; Disaster Helplines</h4>
-              <p>For immediate rescue or life-threatening weather hazards, contact the disaster authorities.</p>
+          {/* 5. EMERGENCY HELPLINES STRIP */}
+          <section className="emergency-banner-section">
+            <div className="emergency-banner">
+              <div className="emergency-banner-left">
+                <span className="emergency-icon">🛡️</span>
+                <div>
+                  <h4>National Emergency &amp; Disaster Helplines</h4>
+                  <p>For immediate rescue or life-threatening weather hazards, contact the disaster authorities.</p>
+                </div>
+              </div>
+              <div className="emergency-banner-right">
+                <span className="helpline-number">📞 NDRF: 1078 | Emergency: 112 | IMD: 1800-180-1717</span>
+              </div>
             </div>
-          </div>
-          <div className="emergency-banner-right">
-            <span className="helpline-number">📞 NDRF: 1078 | Emergency: 112 | IMD: 1800-180-1717</span>
-          </div>
+          </section>
         </div>
-      </section>
 
+        {/* Live Weather News Sidebar */}
+        <aside className="home-news-aside">
+          <WeatherNews />
+        </aside>
+      </div>
     </div>
   );
 }
