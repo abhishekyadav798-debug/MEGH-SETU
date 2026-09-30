@@ -102,6 +102,14 @@ const weatherReportSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    aiVerdictReason: {
+      type: String,
+      default: "",
+    },
+    telemetryCrossCheck: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
   },
   {
     timestamps: true,

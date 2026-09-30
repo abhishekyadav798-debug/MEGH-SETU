@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, NavLink, Link } from "react-router-dom";
 
 import Home from "./pages/Home";
 import LiveMap from "./pages/LiveMap";
+import News from "./pages/News";
 import Events from "./pages/Events";
 import Analytics from "./pages/Analytics";
 import ReportEvent from "./pages/ReportEvent";
@@ -49,6 +50,9 @@ function App() {
             <NavLink to="/" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} onClick={closeMenu} end>
               Home
             </NavLink>
+            <NavLink to="/news" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} onClick={closeMenu}>
+              Live News
+            </NavLink>
             <NavLink to="/map" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} onClick={closeMenu}>
               Live Map
             </NavLink>
@@ -68,6 +72,7 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/news" element={<News />} />
             <Route path="/map" element={<LiveMap />} />
             <Route path="/events" element={<Events />} />
             <Route path="/analytics" element={<Analytics />} />

@@ -9,7 +9,7 @@ function Home() {
   const [loadingAlerts, setLoadingAlerts] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/reports`)
+    fetch(`${API_BASE}/api/reports?status=Verified`)
       .then((response) => {
         if (!response.ok) throw new Error("Network response was not ok");
         return response.json();
@@ -32,12 +32,18 @@ function Home() {
       });
   }, []);
 
+  useEffect(() => {
+    if (window.location.hash === "#news" || window.location.hash === "#news-section") {
+      setTimeout(() => {
+        const el = document.getElementById("news-section");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 200);
+    }
+  }, []);
+
   return (
     <div className="home-page">
-      {/* 2-COLUMN LAYOUT: main content left, news sidebar right */}
-      <div className="home-two-col-layout">
-        <div className="home-main-col">
-          {/* 1. SIMPLE & CLEAR HERO SECTION */}
+      {/* 1. SIMPLE & CLEAR HERO SECTION */}
       <section className="hero-section simple-hero">
         <div className="hero-content">
           <div className="hero-pill">
@@ -54,7 +60,10 @@ function Home() {
           </p>
 
           <div className="hero-buttons">
-            <Link to="/map" className="primary-btn glow-btn">
+            <Link to="/news" className="primary-btn glow-btn" style={{ background: "linear-gradient(135deg, #00b4d8, #0077b6)" }}>
+              📰 Live Weather News
+            </Link>
+            <Link to="/map" className="primary-btn">
               🗺️ Explore Live Map
             </Link>
             <Link to="/report" className="secondary-btn">
@@ -172,7 +181,10 @@ function Home() {
       {/* 3. LIVE WEATHER STREAM (ACCURATE & FAST) */}
       <WeatherWidget />
 
-      {/* 4. QUICK ACCESS PLATFORM SERVICES */}
+      {/* 4. LIVE WEATHER & DISASTER NEWS */}
+      <WeatherNews />
+
+      {/* 5. QUICK ACCESS PLATFORM SERVICES */}
       <section className="features-section">
         <div className="section-heading">
           <p className="eyebrow">KEY SERVICES</p>
@@ -181,6 +193,13 @@ function Home() {
         </div>
 
         <div className="simple-services-grid">
+          <Link to="/news" className="service-card" style={{ border: "1px solid rgba(0, 212, 255, 0.4)" }}>
+            <div className="service-icon">📰</div>
+            <h3>Live Weather &amp; Disaster News</h3>
+            <p>Real-time meteorological warnings, cyclone alerts, and flood updates from IMD &amp; trusted Indian feeds.</p>
+            <span className="service-link-arrow">Read Live News →</span>
+          </Link>
+
           <Link to="/map" className="service-card">
             <div className="service-icon">🗺️</div>
             <h3>Interactive Live Map</h3>
@@ -211,28 +230,21 @@ function Home() {
         </div>
       </section>
 
-          {/* 5. EMERGENCY HELPLINES STRIP */}
-          <section className="emergency-banner-section">
-            <div className="emergency-banner">
-              <div className="emergency-banner-left">
-                <span className="emergency-icon">🛡️</span>
-                <div>
-                  <h4>National Emergency &amp; Disaster Helplines</h4>
-                  <p>For immediate rescue or life-threatening weather hazards, contact the disaster authorities.</p>
-                </div>
-              </div>
-              <div className="emergency-banner-right">
-                <span className="helpline-number">📞 NDRF: 1078 | Emergency: 112 | IMD: 1800-180-1717</span>
-              </div>
+      {/* 6. EMERGENCY HELPLINES STRIP */}
+      <section className="emergency-banner-section">
+        <div className="emergency-banner">
+          <div className="emergency-banner-left">
+            <span className="emergency-icon">🛡️</span>
+            <div>
+              <h4>National Emergency &amp; Disaster Helplines</h4>
+              <p>For immediate rescue or life-threatening weather hazards, contact the disaster authorities.</p>
             </div>
-          </section>
+          </div>
+          <div className="emergency-banner-right">
+            <span className="helpline-number">📞 NDRF: 1078 | Emergency: 112 | IMD: 1800-180-1717</span>
+          </div>
         </div>
-
-        {/* Live Weather News Sidebar */}
-        <aside className="home-news-aside">
-          <WeatherNews />
-        </aside>
-      </div>
+      </section>
     </div>
   );
 }

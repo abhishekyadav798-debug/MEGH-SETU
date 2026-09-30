@@ -120,11 +120,12 @@ function LiveMap() {
     }
   };
 
-  // Filtered reports
+  // Filtered reports (exclude rejected fake reports from map)
   const displayedReports = reports.filter((rep) => {
+    if (rep.verificationStatus === "Rejected") return false;
     if (activeLayer === "WEATHER") return false;
     if (activeLayer === "SEVERE") {
-      return rep.severity === "High" || rep.severity === "Critical";
+      return (rep.severity === "High" || rep.severity === "Critical") && rep.verificationStatus === "Verified";
     }
     return true;
   });
@@ -261,6 +262,22 @@ function LiveMap() {
                         />
                       </div>
                     )}
+
+                    <div style={{ marginTop: "6px", display: "flex", gap: "6px", alignItems: "center" }}>
+                      {report.verificationStatus === "Verified" ? (
+                        <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "rgba(0,230,118,0.2)", color: "#00e676" }}>
+                          ✓ AI Verified
+                        </span>
+                      ) : report.verificationStatus === "Flagged" ? (
+                        <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "rgba(255,146,43,0.2)", color: "#ff922b" }}>
+                          ⚠️ Flagged Suspicious
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 6px", borderRadius: "4px", background: "rgba(255,183,3,0.2)", color: "#ffb703" }}>
+                          ⏳ Pending Review
+                        </span>
+                      )}
+                    </div>
 
                     <div style={{ marginTop: "8px", paddingTop: "6px", borderTop: "1px solid rgba(255,255,255,0.1)", fontSize: "11px", color: "var(--text-dim)" }}>
                       🕒 {new Date(report.createdAt || Date.now()).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })} • Citizen Observation

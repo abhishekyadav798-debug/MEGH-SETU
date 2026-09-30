@@ -47,7 +47,7 @@ function Events() {
   // Real Dynamic Metrics from Database
   const totalEvents = weatherEvents.length;
   const activeAlerts = weatherEvents.filter(
-    (e) => e.severity === "High" || e.severity === "Critical"
+    (e) => (e.severity === "High" || e.severity === "Critical") && e.verificationStatus === "Verified"
   ).length;
   const highSeverityCount = weatherEvents.filter(
     (e) => e.severity === "High"
@@ -193,6 +193,12 @@ function Events() {
                     </div>
                   )}
 
+                  {event.aiVerdictReason && (
+                    <p style={{ fontSize: "11px", color: event.verificationStatus === "Verified" ? "#00e676" : "#ff922b", margin: "6px 0 2px", background: "rgba(0,0,0,0.25)", padding: "4px 8px", borderRadius: "6px" }}>
+                      🤖 <strong>AI Check:</strong> {event.aiVerdictReason}
+                    </p>
+                  )}
+
                   <p className="event-time" style={{ fontSize: "12px", color: "var(--text-dim)" }}>
                     🕒 Logged: {new Date(event.createdAt || Date.now()).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
                   </p>
@@ -200,9 +206,23 @@ function Events() {
               </div>
 
               <div className="event-info">
-                <span className="event-status">
-                  ● Verified Observation
-                </span>
+                {event.verificationStatus === "Verified" ? (
+                  <span className="event-status" style={{ color: "#00e676", borderColor: "rgba(0,230,118,0.4)", background: "rgba(0,230,118,0.12)" }}>
+                    ✓ Verified Observation
+                  </span>
+                ) : event.verificationStatus === "Flagged" ? (
+                  <span className="event-status" style={{ color: "#ff922b", borderColor: "rgba(255,146,43,0.4)", background: "rgba(255,146,43,0.12)" }}>
+                    ⚠️ AI Flagged ({event.aiFakeScore || 65}% Fake Risk)
+                  </span>
+                ) : event.verificationStatus === "Rejected" ? (
+                  <span className="event-status" style={{ color: "#ff4d4f", borderColor: "rgba(255,77,79,0.4)", background: "rgba(255,77,79,0.12)" }}>
+                    ✗ Rejected Fake ({event.aiFakeScore || 80}%)
+                  </span>
+                ) : (
+                  <span className="event-status" style={{ color: "#ffb703", borderColor: "rgba(255,183,3,0.4)", background: "rgba(255,183,3,0.12)" }}>
+                    ⏳ Pending Review
+                  </span>
+                )}
                 <Link
                   to="/map"
                   className="secondary-btn"

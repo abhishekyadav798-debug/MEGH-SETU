@@ -97,39 +97,107 @@ function ReportEvent() {
       </div>
 
       {submitted ? (
-        <div className="success-box">
-          <div className="success-icon">✅</div>
-          <h2>Report Submitted Successfully!</h2>
-          <p>Your observation has been saved to the central database and is now visible on the Live Map and Events registry.</p>
+        <div className={`success-box ${aiResult?.verificationStatus === "Rejected" ? "rejected-box" : aiResult?.verificationStatus === "Flagged" ? "flagged-box" : ""}`} style={{
+          border: aiResult?.verificationStatus === "Rejected"
+            ? "1px solid rgba(255, 77, 79, 0.5)"
+            : aiResult?.verificationStatus === "Flagged"
+            ? "1px solid rgba(255, 146, 43, 0.5)"
+            : "1px solid rgba(0, 230, 118, 0.4)",
+          background: aiResult?.verificationStatus === "Rejected"
+            ? "rgba(255, 77, 79, 0.08)"
+            : aiResult?.verificationStatus === "Flagged"
+            ? "rgba(255, 146, 43, 0.08)"
+            : "rgba(0, 230, 118, 0.05)",
+        }}>
+          <div className="success-icon" style={{ fontSize: "48px" }}>
+            {aiResult?.verificationStatus === "Verified"
+              ? "✅"
+              : aiResult?.verificationStatus === "Rejected"
+              ? "🚫"
+              : aiResult?.verificationStatus === "Flagged"
+              ? "⚠️"
+              : "⏳"}
+          </div>
 
-          {/* AI Result Display */}
+          <h2 style={{
+            color: aiResult?.verificationStatus === "Verified"
+              ? "#00e676"
+              : aiResult?.verificationStatus === "Rejected"
+              ? "#ff4d4f"
+              : aiResult?.verificationStatus === "Flagged"
+              ? "#ff922b"
+              : "#ffb703",
+            margin: "10px 0"
+          }}>
+            {aiResult?.verificationStatus === "Verified"
+              ? "Report Verified & Published!"
+              : aiResult?.verificationStatus === "Rejected"
+              ? "Fake / Inaccurate Report Rejected by AI"
+              : aiResult?.verificationStatus === "Flagged"
+              ? "Suspicious Report Flagged by AI"
+              : "Report Queued for Verification"}
+          </h2>
+
+          <p style={{ maxWidth: "560px", margin: "0 auto 16px", fontSize: "14px", lineHeight: "1.6", color: "var(--text-muted)" }}>
+            {aiResult?.verificationStatus === "Verified"
+              ? "Your observation was cross-checked with real-time satellite telemetry and successfully verified. It is now active on emergency alert channels."
+              : aiResult?.verificationStatus === "Rejected"
+              ? "Severe discrepancy detected against real-time satellite radar and ground sensors. To protect the public from panic and false warnings, this report is REJECTED and SUPPRESSED from public alerts."
+              : aiResult?.verificationStatus === "Flagged"
+              ? "Real-time meteorological telemetry indicates conditions inconsistent with your claim. This report is FLAGGED as suspicious and will NOT appear as an active severe alert until investigated by an administrator."
+              : "Your report has been logged and is pending verification. It will only be posted to active alert feeds once corroborated."}
+          </p>
+
+          {/* AI Result Card */}
           {aiResult && (
             <div style={{
-              margin: "20px auto", maxWidth: "420px", background: "rgba(124,58,237,0.08)",
-              border: "1px solid rgba(124,58,237,0.3)", borderRadius: "12px", padding: "16px 20px", textAlign: "left",
+              margin: "20px auto", maxWidth: "480px", background: "rgba(0,0,0,0.35)",
+              border: "1px solid var(--border-subtle)", borderRadius: "14px", padding: "18px 22px", textAlign: "left",
             }}>
-              <p style={{ fontSize: "12px", fontWeight: 700, color: "#a78bfa", marginBottom: "12px" }}>🧠 AI Analysis Result</p>
-              <div style={{ display: "grid", rowGap: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Authenticity Score</span>
-                  <span style={{ fontWeight: 700, color: aiResult.confidenceScore >= 70 ? "#00e676" : "#ffb703" }}>
-                    {aiResult.confidenceScore}% Genuine
-                  </span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>Fake/Spam Risk</span>
-                  <span style={{ fontWeight: 700, color: aiResult.fakeScore > 40 ? "#ff4d4f" : "#00e676" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "10px" }}>
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "#a78bfa" }}>🧠 AI Verification Analysis</span>
+                <span style={{
+                  fontSize: "11px", fontWeight: 800, padding: "3px 10px", borderRadius: "12px",
+                  background: aiResult.verificationStatus === "Verified" ? "rgba(0,230,118,0.2)" : aiResult.verificationStatus === "Rejected" ? "rgba(255,77,79,0.2)" : "rgba(255,146,43,0.2)",
+                  color: aiResult.verificationStatus === "Verified" ? "#00e676" : aiResult.verificationStatus === "Rejected" ? "#ff4d4f" : "#ff922b",
+                  border: `1px solid ${aiResult.verificationStatus === "Verified" ? "rgba(0,230,118,0.4)" : aiResult.verificationStatus === "Rejected" ? "rgba(255,77,79,0.4)" : "rgba(255,146,43,0.4)"}`
+                }}>
+                  {aiResult.verificationStatus?.toUpperCase()}
+                </span>
+              </div>
+
+              <div style={{ display: "grid", rowGap: "10px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <span style={{ color: "var(--text-muted)" }}>AI Fake/Spam Risk</span>
+                  <span style={{ fontWeight: 800, color: aiResult.fakeScore > 40 ? "#ff4d4f" : "#00e676" }}>
                     {aiResult.fakeScore}%
                   </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>AI Category</span>
-                  <span style={{ fontWeight: 700, color: "var(--text-main)" }}>{aiResult.category}</span>
+
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <span style={{ color: "var(--text-muted)" }}>Authenticity Score</span>
+                  <span style={{ fontWeight: 800, color: aiResult.confidenceScore >= 70 ? "#00e676" : "#ffb703" }}>
+                    {aiResult.confidenceScore}% Genuine
+                  </span>
                 </div>
+
+                {aiResult.verdictReason && (
+                  <div style={{ marginTop: "4px", padding: "8px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.04)", fontSize: "12px", color: "var(--text-main)", lineHeight: "1.5" }}>
+                    <strong>Verdict:</strong> {aiResult.verdictReason}
+                  </div>
+                )}
+
+                {aiResult.telemetry && (
+                  <div style={{ marginTop: "6px", padding: "8px 12px", borderRadius: "8px", background: "rgba(0,212,255,0.06)", border: "1px solid rgba(0,212,255,0.2)", fontSize: "12px", color: "#a5d8ff" }}>
+                    🛰️ <strong>Satellite Telemetry at location:</strong> {aiResult.telemetry.temperature}°C, {aiResult.telemetry.rainMm}mm rain, Wind: {aiResult.telemetry.windSpeedKm} km/h (WMO Code: {aiResult.telemetry.weatherCode})
+                  </div>
+                )}
+
                 {aiResult.flags?.length > 0 && (
-                  <div style={{ marginTop: "4px" }}>
+                  <div style={{ marginTop: "6px" }}>
+                    <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-dim)", margin: "0 0 4px", textTransform: "uppercase" }}>Detection Notes</p>
                     {aiResult.flags.map((flag) => (
-                      <div key={flag} style={{ fontSize: "11px", color: "#ff922b", background: "rgba(255,146,43,0.1)", padding: "3px 8px", borderRadius: "4px", marginBottom: "3px" }}>
+                      <div key={flag} style={{ fontSize: "11px", color: "#ff922b", background: "rgba(255,146,43,0.1)", padding: "4px 8px", borderRadius: "4px", marginBottom: "4px" }}>
                         ⚠️ {flag}
                       </div>
                     ))}
@@ -139,11 +207,11 @@ function ReportEvent() {
             </div>
           )}
 
-          <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginTop: "20px" }}>
-            <Link to="/map" className="primary-btn">🗺️ View on Live Map</Link>
-            <Link to="/events" className="secondary-btn">📋 View Events Log</Link>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginTop: "24px" }}>
+            <Link to="/map" className="primary-btn">🗺️ View Live Map</Link>
+            <Link to="/events" className="secondary-btn">📋 View Events Registry</Link>
             <button className="secondary-btn" onClick={() => { setSubmitted(false); setAiResult(null); }}>
-              + Submit Another
+              + Submit Another Report
             </button>
           </div>
         </div>
